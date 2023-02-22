@@ -13,6 +13,8 @@ driver = webdriver.Chrome(executable_path=PATH)
 driver.get("https://fr.aliexpress.com/")
 #recup titre du site
 print(driver.title)
+print("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-")
+
 
 #acceder a la barre de recherche
 search = driver.find_element(By.NAME, "SearchText")
@@ -21,16 +23,53 @@ search = driver.find_element(By.NAME, "SearchText")
 search.send_keys("phone")
 search.send_keys(Keys.RETURN)
 
-try:
-    elements = WebDriverWait(driver, 15).until(
-        EC.presence_of_element_located((By.CLASS_NAME, "list--gallery--34TropR"))
-    )
+time.sleep(2)
+#scroll down to get more articles
+driver.execute_script("window.scrollBy(0, 2000);")
 
-    hrefs = elements.find_element("href")
-    print(elements.text)
+time.sleep(1)
+div_element = driver.find_element(By.CLASS_NAME, "list--gallery--34TropR" )
+link_elements = div_element.find_elements(By.TAG_NAME, 'a')
 
-finally:
-    driver.quit()
+#stock tous les liens dans une liste et evite les None
+href_list = []
+for link_element in link_elements:
+    href = link_element.get_attribute('href')
+    if href not in [None, "None"]:
+        href_list.append(href)
+
+#taille de la liste
+print(len(href_list))
+
+# n = len(href_list)
+# for j in range(n):
+#     # Check if the index is odd
+#     if j % 2 == 1 and j <= len(href_list)-1:
+#         # Delete the element at the current index
+#         href_list.pop(j)
+
+
+#affiche que les liens utiles 
+j=0
+for i in range(len(href_list)):
+    if i % 2 == 0:
+        print("Lien num", j+1, " = ", href_list[i], "\n")
+        j+=1
+
+print("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-")
+
+print("on a toruvé", len(href_list), "liens dans cette page, dont", j, "sont utiles")
+
+# try:
+#     elements = WebDriverWait(driver, 15).until(
+#         EC.presence_of_element_located((By.CLASS_NAME, "list--gallery--34TropR"))
+#     )
+
+#     hrefs = elements.find_element("href")
+#     print(driver.page_source)
+
+# finally:
+#     driver.quit()
 
 
 
