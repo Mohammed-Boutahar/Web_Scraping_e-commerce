@@ -1,9 +1,47 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+
+#driver Chrome
 PATH = "chromedriver.exe"
 driver = webdriver.Chrome(executable_path=PATH)
 
-driver.get("https://campus2.mines-ales.fr/")
+#site a scraper
+driver.get("https://fr.aliexpress.com/")
+#recup titre du site
+print(driver.title)
 
+#acceder a la barre de recherche
+search = driver.find_element(By.NAME, "SearchText")
+
+#chercher dans la barre de recherche
+search.send_keys("phone")
+search.send_keys(Keys.RETURN)
+
+try:
+    elements = WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "list--gallery--34TropR"))
+    )
+
+    hrefs = elements.find_element("href")
+    print(elements.text)
+
+finally:
+    driver.quit()
+
+
+
+# ID = "id"
+# NAME = "name"
+# XPATH = "xpath"
+# LINK_TEXT = "link text"
+# PARTIAL_LINK_TEXT = "partial link text"
+# TAG_NAME = "tag name"
+# CLASS_NAME = "class name"
+# CSS_SELECTOR = "css selector"
 
 # from selenium import webdriver
 # from selenium.webdriver.common.by import By
