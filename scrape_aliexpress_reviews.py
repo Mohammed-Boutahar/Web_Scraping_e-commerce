@@ -5,9 +5,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
+x = input(str("Veuillez entrer le mot recherché : \n"))
+
 #driver Chrome
 PATH = "chromedriver.exe"
 driver = webdriver.Chrome(executable_path=PATH)
+
 
 #site a scraper
 driver.get("https://fr.aliexpress.com/")
@@ -20,7 +23,7 @@ print("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 search = driver.find_element(By.NAME, "SearchText")
 
 #chercher dans la barre de recherche
-search.send_keys("phone")
+search.send_keys(x)
 search.send_keys(Keys.RETURN)
 
 time.sleep(2)
