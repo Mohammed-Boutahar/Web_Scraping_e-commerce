@@ -3,9 +3,52 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+from pyfiglet import figlet_format
+
+import requests
+from bs4 import BeautifulSoup
+
 import time
 
+#demander le site où chercher
+suite = False
+while suite == False:
+    site = input(str("Veuillez choisir Amazon ou Aliexpress : \n"))
+    if site.lower() == "amazon":
+        print(figlet_format("AMAZON", font = "big" ))
+        suite = True
+    elif site.lower() == "aliexpress":
+        print(figlet_format("AliExpress", font = "big" ))
+        suite = True
+    else:
+        print("erreur de saisie !")
+
+
+#demander l'élement à chercher et étudier
 x = input(str("Veuillez entrer le mot recherché : \n"))
+
+HEADERS = ({'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
+            AppleWebKit/537.36 (KHTML, like Gecko) \
+            Chrome/90.0.4430.212 Safari/537.36',
+            'Accept-Language': 'en-US, en;q=0.5'})
+
+# user define function
+# Scrape the data
+def getdata(url):
+    r = requests.get(url, headers=HEADERS)
+    return r.text
+
+def html_code(url):
+  
+    # pass the url
+    # into getdata function
+    htmldata = getdata(url)
+    soup = BeautifulSoup(htmldata, 'html.parser')
+  
+    # display html code
+    return (soup)
 
 #driver Chrome
 PATH = "chromedriver.exe"
@@ -25,12 +68,15 @@ search = driver.find_element(By.NAME, "SearchText")
 #chercher dans la barre de recherche
 search.send_keys(x)
 search.send_keys(Keys.RETURN)
-
 time.sleep(2)
+
 #scroll down to get more articles
 driver.execute_script("window.scrollBy(0, 2000);")
-
 time.sleep(1)
+
+driver.execute_script("window.scrollBy(2000, 3000);")
+time.sleep(1)
+
 div_element = driver.find_element(By.CLASS_NAME, "list--gallery--34TropR" )
 link_elements = div_element.find_elements(By.TAG_NAME, 'a')
 
@@ -44,24 +90,25 @@ for link_element in link_elements:
 #taille de la liste
 print(len(href_list))
 
-# n = len(href_list)
-# for j in range(n):
-#     # Check if the index is odd
-#     if j % 2 == 1 and j <= len(href_list)-1:
-#         # Delete the element at the current index
-#         href_list.pop(j)
-
-
 #affiche que les liens utiles 
-j=0
+href_clean=[]
+j=1
 for i in range(len(href_list)):
     if i % 2 == 0:
-        print("Lien num", j+1, " = ", href_list[i], "\n")
+        print("Lien num", j, " = ", href_list[i], "\n")
+        href_clean.append(href_list[i])
         j+=1
 
 print("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-")
 
-print("on a toruvé", len(href_list), "liens dans cette page, dont", j, "sont utiles")
+print("on a toruvé", len(href_list), "liens dans cette page, dont", len(href_clean), "sont utiles")
+
+
+
+
+
+
+
 
 # try:
 #     elements = WebDriverWait(driver, 15).until(
@@ -84,37 +131,3 @@ print("on a toruvé", len(href_list), "liens dans cette page, dont", j, "sont ut
 # TAG_NAME = "tag name"
 # CLASS_NAME = "class name"
 # CSS_SELECTOR = "css selector"
-
-# from selenium import webdriver
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.common.keys import Keys
-# from selenium.webdriver.common.action_chains import ActionChains
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
-#
-# # Set the app ID and number of reviews to scrape
-# app_id = 'com.alibaba.aliexpresshd'
-# review_count = 100
-#
-# # Launch the browser and navigate to the app's review page
-# driver = webdriver.Chrome()
-# driver.get(f'https://play.google.com/store/apps/details?id={app_id}&showAllReviews=true')
-#
-# # Scroll to the bottom of the page to load all the reviews
-# while True:
-#     reviews = driver.find_elements(By.XPATH, '//div[@class="jgIq1"]')
-#     if len(reviews) >= review_count:
-#         break
-#     actions = ActionChains(driver)
-#     actions.move_to_element(reviews[-1])
-#     actions.perform()
-#
-# # Extract the reviews
-# for review in reviews[:review_count]:
-#     comment = review.find_element(By.XPATH, './/div[@class="h3YV2d"]').text
-#     print('Comment:', comment)
-#
-# # Close the browser
-# driver.quit()
-#
-# #Qeuel est le segment commercial qui est considéré comme une niche pour d'autre catégorie démographique ou age ou sexe ?
