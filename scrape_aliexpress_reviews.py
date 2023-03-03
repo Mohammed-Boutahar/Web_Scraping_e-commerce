@@ -35,7 +35,7 @@ HEADERS = ({'User-Agent':
             'Accept-Language': 'en-US, en;q=0.5'})
 
 # user define function
-# Scrape the data
+# Scrape the data 
 def getdata(url):
     r = requests.get(url, headers=HEADERS)
     return r.text
@@ -102,6 +102,7 @@ def Aliexpress_scraping(x):
 
     print("on a trouvé", len(href_list), "liens dans cette page, dont", len(href_clean), "sont utiles")
 
+    #fermer le navigateur
     driver.quit()
 
 
