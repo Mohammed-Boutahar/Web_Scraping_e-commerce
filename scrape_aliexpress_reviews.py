@@ -3,7 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+import pandas as pd
 from pyfiglet import figlet_format
 
 import requests
@@ -23,7 +23,7 @@ while suite == False:
         suite = True
     else:
         print("erreur de saisie !")
-
+    #print("ana")
 
 #demander l'élement à chercher et étudier
 search_text = input(str("Veuillez entrer le mot recherché : \n"))
@@ -113,11 +113,32 @@ elif site.lower() == "aliexpress":
 
 
 
-print(html_code(href_clean[0]))
+soup=html_code(href_clean[0])
+
+#didnt work for me
+#reviews=[]
+#for i in soup.findAll("dt",{'class':"buyer-feedback"}):   
+ #reviews.append(i.text)
+
+ #rev={'reviews':reviews}
+ #review_data=pd.DataFrame.from_dict(rev)
+ #pd.set_option('max_colwidth',800)
+ #review_data.head(5)
 
 
+# Récupération du contenu HTML de la page
+response = requests.get(href_clean[0])
+html_content = response.text
 
+# Extraction des commentaires des utilisateurs
+soup = BeautifulSoup(html_content, "html.parser")
+reviews = soup.find_all("div", {"class": "feedback-item"})
 
+# Affichage des commentaires des utilisateurs
+for review in reviews:
+    rating = review.find("div", {"class": "star-view"}).get("title")
+    comment = review.find("div", {"class": "feedback-text"}).text.strip()
+    print("Note: {}\nCommentaire: {}\n".format(rating, comment))
 
 
 # try:
