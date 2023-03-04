@@ -4,6 +4,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
+
+import execjs
+
+
 from pyfiglet import figlet_format
 
 import requests
@@ -49,13 +53,13 @@ def html_code(url):
     # display html code
     return (soup)
 
+ #driver Chrome
+PATH = "chromedriver.exe"
+driver = webdriver.Chrome(executable_path=PATH)
+
 #liste contenant les liens utilent
 href_clean=[]
 def Aliexpress_scraping(x):
-    #driver Chrome
-    PATH = "chromedriver.exe"
-    driver = webdriver.Chrome(executable_path=PATH)
-
     #site a scraper
     driver.get("https://fr.aliexpress.com/")
 
@@ -68,13 +72,12 @@ def Aliexpress_scraping(x):
     #chercher dans la barre de recherche
     search.send_keys(x)
     search.send_keys(Keys.RETURN)
-    time.sleep(2)
+    time.sleep(1)
 
     #scroll down to get more articles
     driver.execute_script("window.scrollBy(0, 2000);")
     time.sleep(1)
-
-    driver.execute_script("window.scrollBy(2000, 3000);")
+    driver.execute_script("window.scrollBy(2000, 4000);")
     time.sleep(1)
 
     div_element = driver.find_element(By.CLASS_NAME, "list--gallery--34TropR" )
@@ -87,8 +90,6 @@ def Aliexpress_scraping(x):
         if href not in [None, "None"]:
             href_list.append(href)
 
-    #taille de la liste
-    print(len(href_list))
 
     #affiche que les liens utiles 
     j=1
@@ -102,8 +103,7 @@ def Aliexpress_scraping(x):
 
     print("on a trouvé", len(href_list), "liens dans cette page, dont", len(href_clean), "sont utiles")
 
-    #fermer le navigateur
-    driver.quit()
+
 
 
 if site.lower() == "amazon":
@@ -113,8 +113,45 @@ elif site.lower() == "aliexpress":
     Aliexpress_scraping(search_text)
 
 
+# Execute JavaScript to open a new tab and navigate to a new URL
+driver.execute_script('window.open("https://www.google.com","_blank");')
+# Basculer vers le nouvel onglet
+driver.switch_to.window(driver.window_handles[1])
+# Simulate a keyboard shortcut to open a new tab
+driver.get(href_clean[0])
 
-soup=html_code(href_clean[0])
+#scroll down to get more articles
+driver.execute_script("window.scrollBy(0, 4000);")
+time.sleep(1)
+driver.execute_script("window.scrollBy(4000, 8000);")
+time.sleep(1)
+driver.execute_script("window.scrollBy(8000, 12000);")
+time.sleep(1)
+
+
+customer_elements = driver.find_element(By.NAME, "feedback" )
+print(customer_elements)
+
+review_elements = customer_elements.find_elements(By.CLASS_NAME, "f-content")
+print(review_elements)
+
+reviews=[]
+for review in review_elements:
+    rating = review.find_element("span", {"class": "star-view"}).find_element("span").get_attribute('style')
+    comment = review.find_element("dl", {"class": "buyer-feedback"}).text.strip()
+    print("Note: {}\nCommentaire: {}\n".format(rating, comment))
+    reviews.append(comment)
+
+
+time.sleep(4)
+
+#fermer le navigateur
+driver.quit()
+
+
+
+
+
 
 #didnt work for me
 #reviews=[]
@@ -127,19 +164,20 @@ soup=html_code(href_clean[0])
  #review_data.head(5)
 
 
-# Récupération du contenu HTML de la page
-response = requests.get(href_clean[0])
-html_content = response.text
+# # Récupération du contenu HTML de la page
+# soup=html_code(href_clean[0])
 
-# Extraction des commentaires des utilisateurs
-soup = BeautifulSoup(html_content, "html.parser")
-reviews = soup.find_all("div", {"class": "feedback-item"})
+# reviews = soup.find_all("div", {"class": "feedback-item"})
 
-# Affichage des commentaires des utilisateurs
-for review in reviews:
-    rating = review.find("div", {"class": "star-view"}).get("title")
-    comment = review.find("div", {"class": "feedback-text"}).text.strip()
-    print("Note: {}\nCommentaire: {}\n".format(rating, comment))
+# # Affichage des commentaires des utilisateurs
+# for review in reviews:
+#     rating = review.find("div", {"class": "star-view"}).get("title")
+#     comment = review.find("div", {"class": "feedback-text"}).text.strip()
+#     print("Note: {}\nCommentaire: {}\n".format(rating, comment))
+
+
+
+
 
 
 # try:
