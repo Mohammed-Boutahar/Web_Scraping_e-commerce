@@ -5,6 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 
+import csv
+
 import execjs
 
 
@@ -113,83 +115,51 @@ elif site.lower() == "aliexpress":
     Aliexpress_scraping(search_text)
 
 
-# Execute JavaScript to open a new tab and navigate to a new URL
-driver.execute_script('window.open("https://www.google.com","_blank");')
-# Basculer vers le nouvel onglet
-driver.switch_to.window(driver.window_handles[1])
-# Simulate a keyboard shortcut to open a new tab
-driver.get(href_clean[0])
+# # Démarche non reussie 
 
-#scroll down to get more articles
-driver.execute_script("window.scrollBy(0, 4000);")
-time.sleep(1)
-driver.execute_script("window.scrollBy(4000, 8000);")
-time.sleep(1)
-driver.execute_script("window.scrollBy(8000, 12000);")
-time.sleep(1)
+# # Execute JavaScript to open a new tab and navigate to a new URL
+# driver.execute_script('window.open("https://www.google.com","_blank");')
+# # Basculer vers le nouvel onglet
+# driver.switch_to.window(driver.window_handles[1])
+# # Simulate a keyboard shortcut to open a new tab
+# driver.get(href_clean[0])
 
+# #scroll down to get more articles
+# driver.execute_script("window.scrollBy(0, 4000);")
+# time.sleep(1)
+# driver.execute_script("window.scrollBy(4000, 8000);")
+# time.sleep(1)
+# driver.execute_script("window.scrollBy(8000, 12000);")
+# time.sleep(1)
 
-customer_elements = driver.find_element(By.NAME, "feedback" )
-print(customer_elements)
-
-review_elements = customer_elements.find_elements(By.CLASS_NAME, "f-content")
-print(review_elements)
-
-reviews=[]
-for review in review_elements:
-    rating = review.find_element("span", {"class": "star-view"}).find_element("span").get_attribute('style')
-    comment = review.find_element("dl", {"class": "buyer-feedback"}).text.strip()
-    print("Note: {}\nCommentaire: {}\n".format(rating, comment))
-    reviews.append(comment)
-
-
-time.sleep(4)
 
 #fermer le navigateur
 driver.quit()
 
 
 
+# Extraction des cles de l'URL
+product_keys = []
+
+for url in href_clean:
+    # Extract the product key from the URL
+    product_key = url.split("/")[-1].split(".")[0]
+    # Add the product key to the list of product keys
+    product_keys.append(product_key)
+
+# Définit le nom du fichier CSV
+filename = 'product_keys.csv'
+
+# Ouvre le fichier CSV en mode écriture et configure le writer
+with open(filename, 'w', newline='') as file:
+    writer = csv.writer(file)
+
+    # Écrit les données dans le fichier CSV
+    writer.writerow(['Product Keys'])
+    for item in product_keys:
+        writer.writerow([item])
 
 
-
-#didnt work for me
-#reviews=[]
-#for i in soup.findAll("dt",{'class':"buyer-feedback"}):   
- #reviews.append(i.text)
-
- #rev={'reviews':reviews}
- #review_data=pd.DataFrame.from_dict(rev)
- #pd.set_option('max_colwidth',800)
- #review_data.head(5)
-
-
-# # Récupération du contenu HTML de la page
-# soup=html_code(href_clean[0])
-
-# reviews = soup.find_all("div", {"class": "feedback-item"})
-
-# # Affichage des commentaires des utilisateurs
-# for review in reviews:
-#     rating = review.find("div", {"class": "star-view"}).get("title")
-#     comment = review.find("div", {"class": "feedback-text"}).text.strip()
-#     print("Note: {}\nCommentaire: {}\n".format(rating, comment))
-
-
-
-
-
-
-# try:
-#     elements = WebDriverWait(driver, 15).until(
-#         EC.presence_of_element_located((By.CLASS_NAME, "list--gallery--34TropR"))
-#     )
-
-#     hrefs = elements.find_element("href")
-#     print(driver.page_source)
-
-# finally:
-#     driver.quit()
 
 
 # ID = "id"
