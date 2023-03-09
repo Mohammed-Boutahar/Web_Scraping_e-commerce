@@ -1,8 +1,6 @@
 import pymongo
 import json
 import pandas as pd
-import numpy as np
-import jsonlines
 import os
 from pymongo import MongoClient
 
@@ -25,27 +23,29 @@ coll.delete_many({})
 
 # insert documents from json files into mongodb
 for i in product_keys_list:
-#    file_path = 'Python/'
-#    file_full_path = os.path.join(file_path, i)
+    #    file_path = 'Python/'
+    #    file_full_path = os.path.join(file_path, i)
     with open(i, 'r', encoding='utf-8') as file:
-        data_str = file.read()
+        data_str = json.load(file)
 
-# Convert the string to a Python dictionary
-    data = json.loads(data_str)
 
-    #prob dans le chunk_size, il vaire selon le json
-    new_obj={}
-    for obj in data:
+    data_s = data_str['feedback']
+    print(data_s)
+    # prob dans le chunk_size, il vaire selon le json
+
+    for obj in data_s:
         new_obj = {
             'displayName': obj['displayName'],
             'country': obj['country'],
             'rating': obj['rating'],
             'date': obj['date'],
             'content': obj['content']
-    }
-    
-    # Insert the new object into the MongoDB collection
-    coll.insert_one(new_obj)
+        }
+
+        # Insert the new object into the MongoDB collection
+        coll.insert_one(new_obj)
+
+
 # export data from mongodb to a csv file
 dataout = pd.DataFrame(list(coll.find()))
-dataout.to_csv('final_scraped_data.csv', encoding='utf-8')
+dataout.to_csv('../final_scraped_data.csv', encoding='utf-8')

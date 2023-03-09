@@ -1,27 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import pandas as pd
-
 import csv
-import os
-
-import execjs
-
-
 from pyfiglet import figlet_format
-
-import requests
-from bs4 import BeautifulSoup
-
 import time
 
-# demander le site où chercher
+# demander le site où chercher (Amazon ne marche pas pour le moment)
 suite = False
 while suite == False:
-    site = input(str("Veuillez choisir Amazon ou Aliexpress : \n"))
+    site = input(str("Veuillez choisir Amazon (non fonctionnel pour le moment) ou Aliexpress : \n"))
     if site.lower() == "amazon":
         print(figlet_format("AMAZON", font="big"))
         suite = True
@@ -30,7 +17,7 @@ while suite == False:
         suite = True
     else:
         print("erreur de saisie !")
-    # print("ana")
+
 
 # demander l'élement à chercher et étudier
 search_text = input(str("Veuillez entrer le mot recherché : \n"))
@@ -41,33 +28,14 @@ HEADERS = ({'User-Agent':
             Chrome/110.0.5481.178 Safari/537.36',
             'Accept-Language': 'en-US, en;q=0.5'})
 
-# user define function
-# Scrape the data
-
-
-def getdata(url):
-    r = requests.get(url, headers=HEADERS)
-    return r.text
-
-
-def html_code(url):
-    # pass the url
-    # into getdata function
-    htmldata = getdata(url)
-    soup = BeautifulSoup(htmldata, 'html.parser')
-
-    # display html code
-    return (soup)
-
-
- # driver Chrome
+# driver Chrome
 PATH = "chromedriver.exe"
 driver = webdriver.Chrome(executable_path=PATH)
 
 # liste contenant les liens utilent
 href_clean = []
 
-
+#Fonction mère qui permet l'extraction des URL
 def Aliexpress_scraping(x):
     # site a scraper
     driver.get("https://fr.aliexpress.com/")
@@ -82,7 +50,7 @@ def Aliexpress_scraping(x):
     search.send_keys(Keys.RETURN)
     time.sleep(1)
 
-    # scroll down to get more articles
+    # scroll down
     driver.execute_script("window.scrollBy(0, 2000);")
     time.sleep(1)
     driver.execute_script("window.scrollBy(2000, 4000);")
@@ -98,7 +66,7 @@ def Aliexpress_scraping(x):
         if href not in [None, "None"]:
             href_list.append(href)
 
-    # affiche que les liens utiles
+    # affiche que les liens utiles car entre chaque deux liens on trouve un lien de publicité
     j = 1
     for i in range(len(href_list)):
         if i % 2 == 0:
@@ -119,7 +87,8 @@ elif site.lower() == "aliexpress":
     Aliexpress_scraping(search_text)
 
 
-# # Démarche non reussie
+
+# # Possibilité d'ouvrir le premier lien extrait dans un nouvel onglet
 
 # # Execute JavaScript to open a new tab and navigate to a new URL
 # driver.execute_script('window.open("https://www.google.com","_blank");')
@@ -127,14 +96,6 @@ elif site.lower() == "aliexpress":
 # driver.switch_to.window(driver.window_handles[1])
 # # Simulate a keyboard shortcut to open a new tab
 # driver.get(href_clean[0])
-
-# #scroll down to get more articles
-# driver.execute_script("window.scrollBy(0, 4000);")
-# time.sleep(1)
-# driver.execute_script("window.scrollBy(4000, 8000);")
-# time.sleep(1)
-# driver.execute_script("window.scrollBy(8000, 12000);")
-# time.sleep(1)
 
 
 # fermer le navigateur
@@ -145,36 +106,18 @@ driver.quit()
 product_keys = []
 
 for url in href_clean:
-        # Extract the product key from the URL
+        #La clé se trouve dans un endroit bien précis de l'URL
         product_key = url.split("/")[-1].split(".")[0]
-        # Add the product key to the list of product keys
         product_keys.append(product_key)
 
 # Définit le nom du fichier CSV
-
-#file_path = 'scraped_data/'
 file_name = 'product_keys.csv'
-#file_full_path = os.path.join(file_path, file_name)
 
 # Ouvre le fichier CSV en mode écriture et configure le writer
 with open(file_name, 'w', newline='') as file:
     writer = csv.writer(file)
-
     # Écrit les données dans le fichier CSV
     writer.writerow(['Product Keys'])
     for item in product_keys:
         writer.writerow([item])
-    print("fichier crée")
-
-
-
-
-
-# ID = "id"
-# NAME = "name"
-# XPATH = "xpath"
-# LINK_TEXT = "link text"
-# PARTIAL_LINK_TEXT = "partial link text"
-# TAG_NAME = "tag name"
-# CLASS_NAME = "class name"
-# CSS_SELECTOR = "css selector"
+    print("fichier des 'product_keys' crée")
