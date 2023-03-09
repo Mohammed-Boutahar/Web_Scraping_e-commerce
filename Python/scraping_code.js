@@ -57,19 +57,19 @@ fs.readFile('product_keys.csv', 'utf-8', (err, data) => {
     csvData.shift();
   });
 
-for(let j = 0; j<3; j++){
-  const product = scrape(csvData[j]);
+//for(let j = 0; j<3; j++){
+  const product = scrape("32808691074");
   product.then(res => {
     //console.log('The JSON: ', res);
     const jsonData = JSON.stringify(res);
     // Écrire la chaîne de caractères dans un fichier
-    fs.writeFile(`data_${j+1}.json`,jsonData, 'utf8', (err) => {
+    fs.writeFile(`data_32808691074.json`,jsonData, 'utf8', (err) => {
     if (err) {
       console.error(err);
       return;
     }
-    console.log(`Le fichier data_${j+1}.json a été enregistré avec succès.`);
+    console.log(`Le fichier data_32808691074.json a été enregistré avec succès.`);
     });
   });
-}
+//}
   
